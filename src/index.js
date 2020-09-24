@@ -28,30 +28,30 @@ app.post('/log/:id/start', async(req, res) => {
             res.status(500).send(error)
         }
     })
-    //set event_type = end for use 
-    // user has to provide his/her corporate id to detail related his/her corporate
+    //set event_type = end for user
+    // user has to provide his/her corporate id to get details  related his/her corporate
 app.post('/log/:id/end/:CID', async(req, res) => {
     try {
-        //add session with event_type= end
+        //add sessionlog with event_type= end
         const session = new UserLog({
             event_type: "end",
             user: req.params.id
         })
         await session.save()
-            //find all user with your coprporate id
+            //find all users with your coprporate id
         const corporate = await User.find({ CorporateId: req.params.CID })
-            //removing duplicate if there is any duplicate
+            //removing duplicate if there are any duplicate
         const data = corporate.filter(function(elem, pos) {
             return corporate.indexOf(elem) == pos;
         })
-        let totalTime = 0 //store  total time by corporate
-        let count = 0 //get number of user who set event_type = end
+        let totalTime = 0 //store  total time spent  by corporate
+        let count = 0 //get number of user who set event_type = end with provided corporateid
         let max = 0 // store user with maximum time spend
         for (let index = 0; index < data.length; index++) {
-            // get endtime and start time for each user in corporate
+            // get end time and start time for each user in corporate
             const endTime = await UserLog.find({ user: data[index]._id, event_type: "end" })
             const startTime = await UserLog.find({ user: data[index]._id, event_type: "start" })
-                // for user endtime and start time both exist then only this conditin works
+                // for user end time and start time both exist then only this conditin works
             if (endTime.length !== 0 && startTime.length !== 0) {
                 count = count + 1
                     //use first index because if user pass multiple end request then we count only first request 
